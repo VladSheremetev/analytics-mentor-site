@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Убежище аналитика — Эксперименты • метрики • продуктовые кейсы</title>
+  <meta name="description" content="Менторство по A/B-тестам, метрикам и продуктовым кейсам." />
+  <meta name="theme-color" content="#f5f5f5" />
+
+  <style>
+    :root{
+      --page:#ffffff;
+      --border:#d9d9d9;
+      --border2:#cfcfcf;
+      --text:#111;
+      --muted:#555;
+
+      /* Header */
+      --hdr:#1f2937;
+      --hdr2:#111827;
+      --hdrText:#e5e7eb;
+      --hdrMuted:#9ca3af;
+      --accent:#4c72b0;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+      --max:1100px;
+      --radius:6px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:var(--page);
+      color:var(--text);
+      font-family:var(--sans);
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+
+    /* ===== Header (JupyterLab-ish) ===== */
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      border-bottom:1px solid rgba(0,0,0,.18);
+    }
+    .hdr-top{
+      background: linear-gradient(180deg, var(--hdr2), var(--hdr));
+      color: var(--hdrText);
+    }
+    .hdr-row{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:10px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    
+      flex-wrap:wrap;}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:inherit;
+      min-width: 240px;
+    
+      }
+    .mark{
+      width:14px;height:14px;border-radius:3px;
+      background: linear-gradient(135deg, rgba(76,114,176,1), rgba(76,114,176,.55));
+      box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset;
+    }
+    .brand .title{
+      font-weight:700;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .brand .subtitle{
+      font-size:12px;
+      color:var(--hdrMuted);
+      margin-left:6px;
+      white-space:nowrap;
+    }
+
+    .hdr-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .hbtn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:6px;
+      background: rgba(255,255,255,.06);
+      color: var(--hdrText);
+      text-decoration:none;
+      font-size:13px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .hbtn:hover{ background: rgba(255,255,255,.10); }
+    .hbtn.primary{
+      background: rgba(76,114,176,.95);
+      border-color: rgba(76,114,176,1);
+      color:#fff;
+    }
+    .hbtn.primary:hover{ filter:brightness(.98); }
+
+    .hdr-sub{
+      background: #0b1220;
+      color: var(--hdrMuted);
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .crumbs{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:8px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size:12px;
+      font-family: var(--mono);
+    }
+    .crumbs .path{
+      opacity:.95;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* ===== Notebook canvas ===== */
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:18px 14px 70px;
+    }
+    .nb-section{ margin: 0 0 14px 0; }
+    .nb-cell{
+      display:grid;
+      grid-template-columns: 92px 1fr;
+      gap:10px;
+      align-items:stretch;
+    }
+    .prompt{
+      font-family:var(--mono);
+      font-size:13px;
+      color:#666;
+      text-align:right;
+      padding-top:10px;
+      padding-right:6px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .prompt .br{ color:#999; }
+    .prompt .num{ color:#333; }
+
+    .input-area{
+      border:1px solid var(--border);
+      background:#f7f7f7;
+      border-radius:var(--radius);
+      padding:12px;
+      position:relative;
+      min-width:0;
+    }
+    .input-area::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:4px;
+      background: rgba(76,114,176,.30);
+      border-top-left-radius:var(--radius);
+      border-bottom-left-radius:var(--radius);
+    }
+
+    .h1{
+      font-size:28px;
+      margin:0 0 8px 0;
+      font-weight:700;
+      letter-spacing:-.2px;
+    }
+    .h2{
+      font-size:18px;
+      margin:0 0 10px 0;
+      font-weight:700;
+    }
+    .lead{
+      margin:0 0 10px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .chips{
+      display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 0 0;
+    }
+    .chip{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:3px 8px;
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:999px;
+      color:#333;
+    }
+
+    .hero-row{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    .about-grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 180px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .avatar{
+      width:180px;height:180px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      background:#fff;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:var(--mono);
+      color:#666;
+      font-size:12px;
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .bullets{
+      margin:8px 0 0 0;
+      padding-left:18px;
+      color:#444;
+    }
+    .bullets li{ margin:6px 0; }
+
+    .kpi-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:10px;
+      min-width:0;
+    }
+    .kpi .t1{ font-weight:700; margin-bottom:3px; }
+    .kpi .t2{ color:var(--muted); font-size:13px; }
+
+    .list{ display:grid; gap:8px; margin-top:6px; }
+    .item{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:8px;
+      padding:10px;
+      color:#222;
+    }
+    .item b{ font-weight:700; }
+    .item .sub{ color:var(--muted); font-size:13px; margin-top:2px; }
+
+    .cols3{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .nb-footer{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid var(--border);
+      color:#666;
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-family:var(--mono);
+    }
+
+    /* Output area (Out [ ]:) */
+    .out-wrap{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: 92px 1fr;
+      gap:10px;
+      align-items:stretch;
+    }
+    .out-prompt{
+      font-family:var(--mono);
+      font-size:13px;
+      color:#666;
+      text-align:right;
+      padding-top:10px;
+      padding-right:6px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .out-area{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:var(--radius);
+      padding:12px;
+      min-width:0;
+    }
+
+    /* Demo cell UI */
+    .toolbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .runbtn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border:1px solid var(--border2);
+      border-radius:6px;
+      background:#fff;
+      cursor:pointer;
+      font-size:13px;
+      font-family:var(--sans);
+    }
+    .runbtn:hover{ background:#fafafa; }
+    .pill{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:3px 8px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+      color:#333;
+    }
+
+    .canvasbox{
+      border:1px solid var(--border);
+      background:#ffffff;
+      border-radius:8px;
+      overflow:hidden;
+    }
+
+    /* ✅ canvas всегда ровно под ширину блока + фиксированная высота */
+    #plot{
+    display:block;
+    width:100%;
+    height:460px;
+    max-height:460px;
+    }
+    @media (max-width: 700px){
+    #plot{ height:360px; max-height:360px; }
+    }
+
+    @media (max-width: 980px){
+      .hero-row{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px){
+      .nb-cell{ grid-template-columns: 72px 1fr; }
+      .out-wrap{ grid-template-columns: 72px 1fr; }
+      .about-grid{ grid-template-columns: 132px 1fr; }
+      .avatar{ width:132px; height:132px; }
+      .kpi-grid{ grid-template-columns: 1fr; }
+      .cols3{ grid-template-columns: 1fr; }
+      .brand .subtitle{ display:none; }
+    }
+
+    /* ===== Extra mobile fixes (very small screens) ===== */
+    @media (max-width: 520px){
+      .hdr-row{ flex-direction:column; align-items:stretch; }
+      .brand{ min-width:0; }
+      .hdr-actions{ justify-content:flex-start; }
+      .hbtn{ font-size:12px; padding:6px 9px; }
+      .crumbs{ flex-direction:column; align-items:flex-start; gap:6px; }
+      .crumbs .path{ white-space:normal; }
+    }
+    @media (max-width: 420px){
+      .nb-cell{ grid-template-columns: 56px 1fr; }
+      .out-wrap{ grid-template-columns: 56px 1fr; }
+      .prompt, .out-prompt{ font-size:12px; padding-right:4px; }
+      #plot{ height:300px; max-height:300px; }
+    }
+
+</style>
+</head>
+
+<body>
+  <header>
+    <div class="hdr-top">
+      <div class="hdr-row">
+        <a class="brand" href="#top">
+          <span class="mark" aria-hidden="true"></span>
+          <span class="title">Убежище аналитика.</span>
+          <span class="subtitle">Эксперименты • метрики • продуктовые кейсы</span>
+        </a>
+
+        <div class="hdr-actions">
+          <a class="hbtn" href="#about">Обо мне</a>
+          <a class="hbtn" href="#lessons">О занятиях</a>
+          <a class="hbtn" href="#format">Формат</a>
+
+          <a class="hbtn" id="liHeaderBtn" href="#" target="_blank" rel="noreferrer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6.94 8.5H4.2V20h2.74V8.5ZM5.57 7.4c.88 0 1.58-.71 1.58-1.58 0-.88-.7-1.58-1.58-1.58S4 4.94 4 5.82c0 .87.7 1.58 1.57 1.58ZM20 20h-2.74v-5.85c0-1.4-.03-3.2-1.95-3.2-1.95 0-2.25 1.52-2.25 3.1V20H10.3V8.5h2.63v1.57h.04c.36-.7 1.26-1.45 2.6-1.45 2.78 0 3.3 1.83 3.3 4.2V20Z" fill="rgba(229,231,235,.95)"/>
+            </svg>
+            LinkedIn
+          </a>
+
+          <a class="hbtn primary" id="tgHeaderBtn" href="#" target="_blank" rel="noreferrer">Написать в Telegram</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hdr-sub">
+      <div class="crumbs">
+        <div class="path">notebook / shelter_analytics / mentoring.ipynb</div>
+        <!-- ✅ quick links removed -->
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="wrap">
+    <!-- SECTION 1 -->
+    <section class="nb-section" id="about">
+      <div class="nb-cell">
+        <div class="prompt">
+          In <span class="br">[</span><span class="num">1</span><span class="br">]:</span>
+        </div>
+
+        <div class="input-area">
+          <div class="hero-row">
+            <div>
+              <div class="h1">Менторство по A/B-тестам и продуктовым кейсам</div>
+              <p class="lead">
+                Без “магии”: структурируем задачу, проектируем эксперимент, выбираем метрики и защищаем выводы.
+              </p>
+
+              <div class="chips">
+                <span class="chip">ab_tests</span>
+                <span class="chip">metrics</span>
+                <span class="chip">cuped</span>
+                <span class="chip">cases</span>
+              </div>
+
+              <div class="about-grid">
+                <div class="avatar">
+                  <!-- <img src="./photo.jpg" alt="Фото" /> -->
+                  PHOTO.jpg<br>180×180
+                </div>
+
+                <div>
+                  <div class="h2">Обо мне</div>
+                  <p class="lead" style="margin-bottom:6px">
+                    Короткое описание (замени): кто ты, какой опыт, кому и в чём помогаешь.
+                  </p>
+
+                  <ul class="bullets">
+                    <li>Достижение / сильная сторона №1 (замени)</li>
+                    <li>Достижение / сильная сторона №2 (замени)</li>
+                    <li>Достижение / сильная сторона №3 (замени)</li>
+                    <li>Достижение / сильная сторона №4 (замени)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <aside>
+              <div class="h2">С чем я помогу</div>
+              <div class="kpi-grid">
+                <div class="kpi"><div class="t1">План</div><div class="t2">индивидуальный роадмап на 2–6 недель</div></div>
+                <div class="kpi"><div class="t1">Практика</div><div class="t2">домашки + разбор на твоих данных/кейсе</div></div>
+                <div class="kpi"><div class="t1">Шаблоны</div><div class="t2">дизайн-док эксперимента и чек-листы</div></div>
+                <div class="kpi"><div class="t1">Уверенность</div><div class="t2">при прохождения собеседования</div></div>
+              </div>
+
+              <div class="item" style="margin-top:10px">
+                <b>Как обычно строим занятие</b>
+                <div class="sub" style="font-family:var(--mono)">
+                  hypothesis → metric → design → test/CI → interpretation → decision
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section class="nb-section" id="lessons">
+      <div class="nb-cell">
+        <div class="prompt">
+          In <span class="br">[</span><span class="num">2</span><span class="br">]:</span>
+        </div>
+
+        <div class="input-area">
+          <div class="h2">О занятиях</div>
+          <p class="lead">
+            Здесь ты опишешь особенности занятий со мной (замени текст).
+          </p>
+
+          <div class="list">
+            <div class="item"><b>Фокус на решениях</b><div class="sub">не только значимость, но эффект, риски и вывод для продукта</div></div>
+            <div class="item"><b>Практика</b><div class="sub">разбор твоих задач и кейсов с понятными шагами</div></div>
+            <div class="item"><b>Структура</b><div class="sub">план, домашки, конспект, чек-листы</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section class="nb-section" id="format">
+      <div class="nb-cell">
+        <div class="prompt">
+          In <span class="br">[</span><span class="num">3</span><span class="br">]:</span>
+        </div>
+
+        <div class="input-area">
+          <div class="h2">Формат взаимодействия</div>
+
+          <div class="cols3">
+            <div class="item"><b>60–90 минут</b><div class="sub">созвон + совместная работа</div></div>
+            <div class="item"><b>Домашка</b><div class="sub">короткая, но “в точку”</div></div>
+            <div class="item"><b>Материалы</b><div class="sub">шаблоны и чек-листы</div></div>
+          </div>
+
+          <div class="item" style="margin-top:10px">
+            <b>Типовой трек (пример)</b>
+            <div class="sub">1) постановка гипотез → 2) дисперсия (страты/CUPED) → 3) дизайн сложных тестов → 4) кейсы + защита результата</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: LLN demo -->
+<section class="nb-section" id="demo">
+  <div class="nb-cell">
+    <div class="prompt">
+      In <span class="br">[</span><span class="num">4</span><span class="br">]:</span>
+    </div>
+
+    <div class="input-area">
+      <div class="h2">Демо: закон больших чисел</div>
+      <p class="lead">
+        Нажми Run — сгенерируем i.i.d. выборку и покажем, как выборочное среднее сходится к матожиданию
+        и как сужается 95% доверительный интервал для среднего.
+      </p>
+
+      <div class="toolbar">
+        <button class="runbtn" id="runBtn" type="button" aria-label="Run">▶ Run</button>
+        <span class="pill" id="pillMu" style="display:none"></span>
+        <span class="pill" id="pillN"  style="display:none"></span>
+      </div>
+
+      <div class="canvasbox">
+        <canvas id="plot"></canvas>
+      </div>
+
+      <div class="out-wrap">
+        <div class="out-prompt">
+          Out <span class="br">[</span><span class="num">4</span><span class="br">]:</span>
+        </div>
+        <div class="out-area">
+          <div id="outText" style="font-family:var(--mono); color:#444;">(output will appear here)</div>
+        </div>
+      </div>
+
+      <div class="nb-footer">
+        <div>© <span id="year"></span> • Убежище аналитика</div>
+        <div>Telegram: <span id="tgFooter"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  </main>
+
+<script>
+  // === SETTINGS ===
+  const TG_HANDLE = "@your_handle"; // например "@VSheremetev"
+  const TG_LINK = "https://t.me/" + TG_HANDLE.replace("@","");
+  const LINKEDIN_URL = "https://www.linkedin.com/in/your-profile/"; // ← вставь ссылку
+
+  // === HEADER INIT ===
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("tgHeaderBtn").href = TG_LINK;
+  document.getElementById("tgFooter").textContent = TG_HANDLE;
+  document.getElementById("liHeaderBtn").href = LINKEDIN_URL;
+
+  // === PLOT / ANIMATION ===
+  const canvas = document.getElementById("plot");
+  const ctx = canvas.getContext("2d");
+  const outText = document.getElementById("outText");
+  const runBtn = document.getElementById("runBtn");
+
+  // ✅ будем хранить CSS-размеры и DPR
+  let DPR = 1;
+  let CSS_W = 600;
+  let CSS_H = 300;
+
+  // parameters for the demo
+  const MU = 0.0;
+  const SIGMA = 1.0;
+  const Z = 1.96;          // 95% CI (normal approx)
+  const N_MAX = 240;       // меньше n — легче рассмотреть
+  const BATCH = 2;         // points per frame (speed)
+
+  let animId = null;
+
+  // Box-Muller N(0,1)
+  function randn(){
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  function clear(){
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, CSS_W, CSS_H);
+  }
+
+  // ✅ axes with no labels (grid + thin axes) — сохраняю стиль как был
+  function drawAxes(){
+    const w = CSS_W, h = CSS_H;
+
+    const padL = 34, padR = 14, padT = 14, padB = 22;
+    const x0 = padL, x1 = w - padR, y0 = h - padB, y1 = padT;
+
+    // grid
+    ctx.strokeStyle = "rgba(0,0,0,0.06)";
+    ctx.lineWidth = 1;
+
+    for(let i=0;i<=6;i++){
+      const y = y1 + (y0-y1)*i/6;
+      ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+    }
+    for(let i=0;i<=8;i++){
+      const x = x0 + (x1-x0)*i/8;
+      ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y1); ctx.stroke();
+    }
+
+    // axes
+    ctx.strokeStyle = "rgba(0,0,0,0.22)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.stroke();
+
+    return {x0,x1,y0,y1};
+  }
+
+  // map (n, value) to canvas coords
+  function makeMapper(axes){
+    const {x0,x1,y0,y1} = axes;
+    const nMin = 1, nMax = N_MAX;
+
+    // y-range for the mean trajectory (wide enough to see convergence)
+    // for N(0,1) mean typically stays within ~[-1,1], but we keep [-2.5,2.5]
+    const yMin = MU - 2.5 * SIGMA;
+    const yMax = MU + 2.5 * SIGMA;
+
+    const x = (n) => x0 + (x1-x0) * ((n - nMin) / (nMax - nMin));
+    const y = (v) => y0 - (y0-y1) * ((v - yMin) / (yMax - yMin));
+
+    return {x,y,yMin,yMax};
+  }
+
+  function drawLLNSeries(axes, series){
+    const {x0,x1,y0,y1} = axes;
+    const map = makeMapper(axes);
+    const {means, lo, hi} = series;
+
+    // true mean line
+    ctx.strokeStyle = "rgba(220,38,38,0.85)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x0, map.y(MU));
+    ctx.lineTo(x1, map.y(MU));
+    ctx.stroke();
+
+    // CI envelope (upper/lower)
+    ctx.strokeStyle = "rgba(76,114,176,0.35)";
+    ctx.lineWidth = 1.5;
+
+    // lower
+    ctx.beginPath();
+    for(let i=0;i<lo.length;i++){
+      const n = i + 1;
+      const cx = map.x(n);
+      const cy = map.y(lo[i]);
+      if(i===0) ctx.moveTo(cx,cy);
+      else ctx.lineTo(cx,cy);
+    }
+    ctx.stroke();
+
+    // upper
+    ctx.beginPath();
+    for(let i=0;i<hi.length;i++){
+      const n = i + 1;
+      const cx = map.x(n);
+      const cy = map.y(hi[i]);
+      if(i===0) ctx.moveTo(cx,cy);
+      else ctx.lineTo(cx,cy);
+    }
+    ctx.stroke();
+
+    // mean trajectory
+    ctx.strokeStyle = "rgba(76,114,176,0.95)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for(let i=0;i<means.length;i++){
+      const n = i + 1;
+      const cx = map.x(n);
+      const cy = map.y(means[i]);
+      if(i===0) ctx.moveTo(cx,cy);
+      else ctx.lineTo(cx,cy);
+    }
+    ctx.stroke();
+
+    // ===== legend (moved right + background) =====
+const fontMono = getComputedStyle(document.documentElement)
+  .getPropertyValue("--mono");
+
+ctx.font = "12px " + fontMono;
+
+// ⬅️ сдвиг вправо и вниз
+const lx = x1 - 170;
+const ly = y1 + 22;
+const lh = 18;
+
+// background panel
+ctx.fillStyle = "rgba(255,255,255,0.85)";
+ctx.strokeStyle = "rgba(0,0,0,0.12)";
+ctx.lineWidth = 1;
+
+ctx.beginPath();
+ctx.roundRect(lx - 10, ly - 14, 160, 62, 6);
+ctx.fill();
+ctx.stroke();
+
+// μ line
+ctx.fillStyle = "rgba(220,38,38,0.85)";
+ctx.fillRect(lx - 4, ly - 7, 12, 3);
+ctx.fillStyle = "rgba(0,0,0,0.7)";
+ctx.fillText("μ (истинное)", lx + 14, ly);
+
+// mean trajectory
+ctx.fillStyle = "rgba(76,114,176,0.95)";
+ctx.fillRect(lx - 4, ly + lh - 7, 12, 3);
+ctx.fillStyle = "rgba(0,0,0,0.7)";
+ctx.fillText("x̄ₙ", lx + 14, ly + lh);
+
+// CI
+ctx.fillStyle = "rgba(76,114,176,0.35)";
+ctx.fillRect(lx - 4, ly + 2*lh - 7, 12, 3);
+ctx.fillStyle = "rgba(0,0,0,0.7)";
+ctx.fillText("95% CI", lx + 14, ly + 2*lh);
+
+  }
+
+  function runDemo(){
+    if(animId) cancelAnimationFrame(animId);
+
+    outText.textContent = "(running...)";
+
+    // Welford online variance
+    let n = 0;
+    let mean = 0;
+    let M2 = 0;
+
+    const means = [];
+    const lo = [];
+    const hi = [];
+
+    function oneStep(){
+      const x = MU + SIGMA * randn();
+      n += 1;
+
+      const delta = x - mean;
+      mean += delta / n;
+      const delta2 = x - mean;
+      M2 += delta * delta2;
+
+      // sample std
+      const s2 = (n > 1) ? (M2 / (n - 1)) : 0;
+      const s = Math.sqrt(Math.max(0, s2));
+
+      // normal approx CI for mean
+      const half = (n > 1) ? (Z * s / Math.sqrt(n)) : 0;
+      means.push(mean);
+      lo.push(mean - half);
+      hi.push(mean + half);
+    }
+
+    function frame(){
+      for(let k=0; k<BATCH && n < N_MAX; k++){
+        oneStep();
+      }
+
+      clear();
+      const axes = drawAxes();
+      drawLLNSeries(axes, {means, lo, hi});
+
+      const halfNow = (n > 1) ? (hi[n-1] - means[n-1]) : 0;
+      outText.textContent =
+            "\"Есть три вида лжи: ложь, наглая ложь и статистика\"";
+      if(n < N_MAX){
+        animId = requestAnimationFrame(frame);
+      }
+    }
+
+    animId = requestAnimationFrame(frame);
+  }
+
+  // ✅ high-DPI + fit to container, always stays inside the block
+  function resizeCanvas(){
+    const box = canvas.parentElement.getBoundingClientRect();
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+
+    CSS_W = Math.max(260, Math.floor(box.width));
+    CSS_H = Math.floor(parseFloat(getComputedStyle(canvas).height)) || 300;
+
+    canvas.width  = Math.floor(CSS_W * DPR);
+    canvas.height = Math.floor(CSS_H * DPR);
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    clear();
+    drawAxes();
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+
+  // initial
+  outText.textContent = "(output will appear here)";
+  resizeCanvas();
+
+  runBtn.addEventListener("click", runDemo);
+
+</script>
+
+</body>
+</html>
