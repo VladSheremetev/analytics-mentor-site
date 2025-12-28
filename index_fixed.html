@@ -449,6 +449,95 @@
       }
     }
 
+    /* ===== Subtle Telegram CTA (mobile only, appears at the very end) ===== */
+
+    /* Hide CTA by default (desktop) */
+    .tg-cta{
+      display:none;
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:80;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 30px rgba(0,0,0,.10);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-family: var(--sans);
+      transform: translateY(10px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+      max-width: min(420px, calc(100vw - 32px));
+    }
+
+    /* Show container on mobile only */
+    @media (max-width: 520px){
+      .tg-cta{ display:flex; left:16px; right:16px; justify-content:space-between; }
+      .tg-cta .txt{ max-width:none; white-space:normal; }
+    }
+
+    .tg-cta.show{
+      opacity:1;
+      transform: translateY(0);
+      pointer-events:auto;
+    }
+
+    .tg-cta .txt{
+      font-size:13px;
+      color:#111;
+      line-height:1.25;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:240px;
+    }
+
+    .tg-cta a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(76,114,176,.95);
+      color:#fff;
+      text-decoration:none;
+      font-size:13px;
+      border:1px solid rgba(76,114,176,1);
+      white-space:nowrap;
+    }
+    .tg-cta a:hover{ filter:brightness(.98); }
+
+    .tg-cta button{
+      border:0;
+      background: transparent;
+      color: rgba(0,0,0,.45);
+      cursor:pointer;
+      font-size:16px;
+      line-height:1;
+      padding:6px 6px;
+      border-radius:999px;
+    }
+    .tg-cta button:hover{ background: rgba(0,0,0,.06); }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .tg-cta{ transition:none; transform:none; }
+    }
+
+    /* iOS safe-area */
+    @supports (padding: max(0px)){
+      .tg-cta{
+        right: max(16px, env(safe-area-inset-right));
+        bottom: max(16px, env(safe-area-inset-bottom));
+      }
+    }
+
+
 
 </style>
 </head>
@@ -476,6 +565,9 @@
           </a>
 
           <a class="hbtn primary" id="tgHeaderBtn" href="#" target="_blank" rel="noreferrer">Написать в Telegram</a>
+          <a class="hbtn" id="tgChannelBtn" href="#" target="_blank" rel="noreferrer">
+          📢 Telegram-канал
+          </a>
         </div>
       </div>
     </div>
@@ -676,12 +768,66 @@
   const TG_HANDLE = "@VSheremetev"; // например "@VSheremetev"
   const TG_LINK = "https://t.me/m/hCYcMS8eYzli" + TG_HANDLE.replace("@","");
   const LINKEDIN_URL = "https://www.linkedin.com/in/vlad-sheremetev/"; // ← вставь ссылку
+  const TG_CHANNEL_URL = "https://t.me/shelter_analytics"
 
   // === HEADER INIT ===
   document.getElementById("year").textContent = new Date().getFullYear();
   document.getElementById("tgHeaderBtn").href = TG_LINK;
   document.getElementById("tgFooter").textContent = TG_HANDLE;
   document.getElementById("liHeaderBtn").href = LINKEDIN_URL;
+  document.getElementById("tgChannelBtn").href = TG_CHANNEL_URL;
+
+  // === SUBTLE CTA (mobile only, appears at the very end) ===
+(function(){
+  // Mobile only
+  if (!window.matchMedia("(max-width: 520px)").matches) return;
+
+  const tgCta = document.getElementById("tgCta");
+  const tgCtaLink = document.getElementById("tgCtaLink");
+  const tgCtaClose = document.getElementById("tgCtaClose");
+  if (!tgCta || !tgCtaLink || !tgCtaClose) return;
+
+  // same link as header "Написать в Telegram"
+  tgCtaLink.href = TG_LINK;
+
+  // non-invasive: hide for 7 days after close
+  const CTA_KEY = "tgCtaDismissed_v1";
+  function isDismissed(){
+    try{
+      const raw = localStorage.getItem(CTA_KEY);
+      if(!raw) return false;
+      const obj = JSON.parse(raw);
+      return (Date.now() - obj.ts) < 7*24*60*60*1000;
+    }catch(e){ return false; }
+  }
+  function dismissCta(){
+    try{ localStorage.setItem(CTA_KEY, JSON.stringify({ts: Date.now()})); }catch(e){}
+    tgCta.classList.remove("show");
+  }
+  tgCtaClose.addEventListener("click", dismissCta);
+
+  let ctaShown = false;
+  function maybeShowCta(){
+    if(ctaShown || isDismissed()) return;
+
+    const doc = document.documentElement;
+    const scrollTop = window.scrollY || doc.scrollTop || 0;
+    const viewportH = window.innerHeight || doc.clientHeight || 0;
+    const fullH = Math.max(doc.scrollHeight, document.body.scrollHeight);
+
+    // show only at the VERY end (last ~3%)
+    const progress = (scrollTop + viewportH) / Math.max(1, fullH);
+    if(progress >= 0.97){
+      ctaShown = true;
+      tgCta.classList.add("show");
+    }
+  }
+
+  window.addEventListener("scroll", maybeShowCta, {passive:true});
+  window.addEventListener("resize", maybeShowCta);
+  maybeShowCta();
+})();
+
 
   // === PLOT / ANIMATION ===
   const canvas = document.getElementById("plot");
@@ -960,6 +1106,13 @@ ctx.fillText("95% CI", lx + 14, ly + 2*lh);
   runBtn.addEventListener("click", runDemo);
 
 </script>
+
+<!-- Subtle Telegram CTA (mobile only) -->
+<div class="tg-cta" id="tgCta" aria-live="polite">
+  <div class="txt">Дошли до конца — давай обсудим. Напиши мне в Telegram</div>
+  <a id="tgCtaLink" href="#" target="_blank" rel="noreferrer">Написать</a>
+  <button id="tgCtaClose" type="button" aria-label="Закрыть">×</button>
+</div>
 
 </body>
 </html>
