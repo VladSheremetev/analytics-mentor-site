@@ -402,6 +402,54 @@
       #plot{ height:300px; max-height:300px; }
     }
 
+        /* ===== About me redesign ===== */
+    .about-lead{
+      font-size:15px;
+      line-height:1.6;
+      color:#333;
+      margin-bottom:14px;
+    }
+
+    .about-lead b{
+      font-weight:600;
+      color:#111;
+    }
+
+    .about-facts{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+
+    .fact{
+      background:#ffffff;
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:10px 12px;
+    }
+
+    .fact-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      color:var(--muted);
+      margin-bottom:4px;
+      font-family:var(--mono);
+    }
+
+    .fact-text{
+      font-size:14px;
+      color:#222;
+      line-height:1.4;
+    }
+
+    @media (max-width: 700px){
+      .about-facts{
+        grid-template-columns: 1fr;
+      }
+    }
+
+
 </style>
 </head>
 
@@ -411,8 +459,8 @@
       <div class="hdr-row">
         <a class="brand" href="#top">
           <span class="mark" aria-hidden="true"></span>
-          <span class="title">Убежище аналитика.</span>
-          <span class="subtitle">Эксперименты • метрики • продуктовые кейсы</span>
+          <span class="title">Шереметьев Владислав</span>
+          <span class="subtitle">Эксперименты (АБ) • метрики • продуктовые кейсы</span>
         </a>
 
         <div class="hdr-actions">
@@ -453,53 +501,80 @@
             <div>
               <div class="h1">Менторство по A/B-тестам и продуктовым кейсам</div>
               <p class="lead">
-                Без “магии”: структурируем задачу, проектируем эксперимент, выбираем метрики и защищаем выводы.
+                Есть сложности с АБ-тестами (статистикой)?
+                Не понимаете, как решать продуктовые кейсы?
+                Хотите расширить свои знания?
+                Тогда вы по адресу!
               </p>
 
-              <div class="chips">
+              <!-- <div class="chips">
                 <span class="chip">ab_tests</span>
                 <span class="chip">metrics</span>
                 <span class="chip">cuped</span>
                 <span class="chip">cases</span>
-              </div>
+              </div> -->
 
               <div class="about-grid">
                 <div class="avatar">
-                  <!-- <img src="./photo.jpg" alt="Фото" /> -->
-                  PHOTO.jpg<br>180×180
+                  <img src="./photo.jpg" alt="Фото" />
+                  <!-- PHOTO.jpg<br>180×180 -->
                 </div>
 
                 <div>
-                  <div class="h2">Обо мне</div>
-                  <p class="lead" style="margin-bottom:6px">
-                    Короткое описание (замени): кто ты, какой опыт, кому и в чём помогаешь.
-                  </p>
+                <div class="h2">Обо мне</div>
 
-                  <ul class="bullets">
-                    <li>Достижение / сильная сторона №1 (замени)</li>
-                    <li>Достижение / сильная сторона №2 (замени)</li>
-                    <li>Достижение / сильная сторона №3 (замени)</li>
-                    <li>Достижение / сильная сторона №4 (замени)</li>
-                  </ul>
+                <p class="about-lead">
+                  Выпускник мехмата МГУ. В обучении делаю упор не на формулы ради формул,
+                  а на <b>понимание статистики, продуктового смысла и формирование математической интуиции</b>.
+                </p>
+
+                <div class="about-facts">
+                  <div class="fact">
+                    <div class="fact-title">Образование</div>
+                    <div class="fact-text">Мехмат МГУ, Академия Аналитиков Авито (ААА)</div>
+                  </div>
+
+                  <div class="fact">
+                    <div class="fact-title">Опыт</div>
+                    <div class="fact-text">
+                      Продуктовый аналитик в Авито, сейчас - помогаю делать АБ в команде персонального маркетинга X5 Tech
+                    </div>
+                  </div>
+
+                  <div class="fact">
+                    <div class="fact-title">Экспертиза</div>
+                    <div class="fact-text">
+                      A/B-тесты, статистика, продуктовые кейсы, собеседования аналитиков]]
+                    </div>
+                  </div>
+
+                  <div class="fact">
+                    <div class="fact-title">Менторство</div>
+                    <div class="fact-text">
+                      Помогал с курсами и отбором в ААА, провёл 50+ собеседований, менторство студентов
+                    </div>
+                  </div>
                 </div>
+              </div>
+
               </div>
             </div>
 
             <aside>
               <div class="h2">С чем я помогу</div>
               <div class="kpi-grid">
-                <div class="kpi"><div class="t1">План</div><div class="t2">индивидуальный роадмап на 2–6 недель</div></div>
-                <div class="kpi"><div class="t1">Практика</div><div class="t2">домашки + разбор на твоих данных/кейсе</div></div>
-                <div class="kpi"><div class="t1">Шаблоны</div><div class="t2">дизайн-док эксперимента и чек-листы</div></div>
+                <div class="kpi"><div class="t1">План</div><div class="t2">индивидуальный роадмап под ваш запрос</div></div>
+                <div class="kpi"><div class="t1">Практика</div><div class="t2">домашки (с теоретическими и практическими задачами) + разбор их на встречах</div></div>
+                <div class="kpi"><div class="t1">Шаблоны</div><div class="t2">дизайн-док решения продуктовых кейсов</div></div>
                 <div class="kpi"><div class="t1">Уверенность</div><div class="t2">при прохождения собеседования</div></div>
               </div>
 
-              <div class="item" style="margin-top:10px">
+              <!-- <div class="item" style="margin-top:10px">
                 <b>Как обычно строим занятие</b>
                 <div class="sub" style="font-family:var(--mono)">
                   hypothesis → metric → design → test/CI → interpretation → decision
                 </div>
-              </div>
+              </div> -->
             </aside>
           </div>
         </div>
@@ -516,12 +591,13 @@
         <div class="input-area">
           <div class="h2">О занятиях</div>
           <p class="lead">
-            Здесь ты опишешь особенности занятий со мной (замени текст).
+            Особенность занятий со мной заключаются в том, что мы закрываем все основные компетенции аналитика комплексно:
+            мы изучаем АБ-тесты, прорабатывая всю теорию практикой, а потом, по мере освоения базовых принципов, мы начинаем решать практические кейсы + оценивать синтетические АБ-тесты для закрепления всего изученого.
           </p>
 
           <div class="list">
-            <div class="item"><b>Фокус на решениях</b><div class="sub">не только значимость, но эффект, риски и вывод для продукта</div></div>
-            <div class="item"><b>Практика</b><div class="sub">разбор твоих задач и кейсов с понятными шагами</div></div>
+            <div class="item"><b>Фокус на понимание</b><div class="sub">идем от общего и фундаментального и формируем интуицию математическую</div></div>
+            <div class="item"><b>Практика</b><div class="sub">решаем много задач на Python и отвечаем на 50+ вопросов на понимание с собеседований</div></div>
             <div class="item"><b>Структура</b><div class="sub">план, домашки, конспект, чек-листы</div></div>
           </div>
         </div>
@@ -539,15 +615,15 @@
           <div class="h2">Формат взаимодействия</div>
 
           <div class="cols3">
-            <div class="item"><b>60–90 минут</b><div class="sub">созвон + совместная работа</div></div>
-            <div class="item"><b>Домашка</b><div class="sub">короткая, но “в точку”</div></div>
-            <div class="item"><b>Материалы</b><div class="sub">шаблоны и чек-листы</div></div>
+            <div class="item"><b>60 минут</b><div class="sub">созвон + совместная работа</div></div>
+            <div class="item"><b>Домашка</b><div class="sub">основательная, но без "сухой математики", а только задачи из практики</div></div>
+            <div class="item"><b>Поддержка</b><div class="sub">Постоянная связь со мной и ответы на все ваши вопросы</div></div>
           </div>
 
-          <div class="item" style="margin-top:10px">
+          <!-- <div class="item" style="margin-top:10px">
             <b>Типовой трек (пример)</b>
             <div class="sub">1) постановка гипотез → 2) дисперсия (страты/CUPED) → 3) дизайн сложных тестов → 4) кейсы + защита результата</div>
-          </div>
+          </div> -->
         </div>
       </div>
     </section>
@@ -560,10 +636,9 @@
     </div>
 
     <div class="input-area">
-      <div class="h2">Демо: закон больших чисел</div>
+      <div class="h2">ЗБЧ</div>
       <p class="lead">
-        Нажми Run — сгенерируем i.i.d. выборку и покажем, как выборочное среднее сходится к матожиданию
-        и как сужается 95% доверительный интервал для среднего.
+        Нажми Run — сгенерируем i.i.d. выборку и покажем, как работает Закон Больших Чисел.
       </p>
 
       <div class="toolbar">
@@ -576,14 +651,14 @@
         <canvas id="plot"></canvas>
       </div>
 
-      <div class="out-wrap">
-        <div class="out-prompt">
+      <!-- <div class="out-wrap">
+        <div class="out-wrap" id="outWrap" style="display:none">
           Out <span class="br">[</span><span class="num">4</span><span class="br">]:</span>
         </div>
         <div class="out-area">
-          <div id="outText" style="font-family:var(--mono); color:#444;">(output will appear here)</div>
+          <div id="outText" style="font-family:var(--mono); color:#444;"></div>
         </div>
-      </div>
+      </div> -->
 
       <div class="nb-footer">
         <div>© <span id="year"></span> • Убежище аналитика</div>
@@ -598,9 +673,9 @@
 
 <script>
   // === SETTINGS ===
-  const TG_HANDLE = "@your_handle"; // например "@VSheremetev"
-  const TG_LINK = "https://t.me/" + TG_HANDLE.replace("@","");
-  const LINKEDIN_URL = "https://www.linkedin.com/in/your-profile/"; // ← вставь ссылку
+  const TG_HANDLE = "@VSheremetev"; // например "@VSheremetev"
+  const TG_LINK = "https://t.me/m/hCYcMS8eYzli" + TG_HANDLE.replace("@","");
+  const LINKEDIN_URL = "https://www.linkedin.com/in/vlad-sheremetev/"; // ← вставь ссылку
 
   // === HEADER INIT ===
   document.getElementById("year").textContent = new Date().getFullYear();
@@ -613,6 +688,7 @@
   const ctx = canvas.getContext("2d");
   const outText = document.getElementById("outText");
   const runBtn = document.getElementById("runBtn");
+  const outWrap = document.getElementById("outWrap");
 
   // ✅ будем хранить CSS-размеры и DPR
   let DPR = 1;
@@ -780,9 +856,33 @@ ctx.fillText("95% CI", lx + 14, ly + 2*lh);
 
   }
 
+  function mountOutBlock(){
+    if (document.getElementById("outWrap")) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "out-wrap";
+    wrap.id = "outWrap";
+
+    wrap.innerHTML = `
+      <div class="out-prompt">
+        Out <span class="br">[</span><span class="num">4</span><span class="br">]:</span>
+      </div>
+      <div class="out-area">
+        <div id="outText" style="font-family:var(--mono); color:#444;"></div>
+      </div>
+    `;
+
+    const canvasBox = document.querySelector("#demo .canvasbox");
+    canvasBox.after(wrap);
+  }
+
   function runDemo(){
     if(animId) cancelAnimationFrame(animId);
 
+    mountOutBlock();
+
+    const outText = document.getElementById("outText");
+    outText.textContent = "Есть три вида лжи: ложь, наглая ложь и статистика";
     outText.textContent = "(running...)";
 
     // Welford online variance
@@ -854,7 +954,7 @@ ctx.fillText("95% CI", lx + 14, ly + 2*lh);
   window.addEventListener("resize", resizeCanvas);
 
   // initial
-  outText.textContent = "(output will appear here)";
+  // outText.textContent = "(output will appear here)";
   resizeCanvas();
 
   runBtn.addEventListener("click", runDemo);
